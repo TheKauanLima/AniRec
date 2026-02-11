@@ -24,6 +24,12 @@ const RegisterPage = () => {
       const response = await apiClient.post('/auth/register', formData);
       localStorage.setItem('token', response.data.token);
       localStorage.setItem('user', JSON.stringify(response.data.user));
+      
+      // Show success message about email verification
+      if (response.data.requiresVerification) {
+        alert('Registration successful! Please check your email to verify your account.');
+      }
+      
       navigate('/');
     } catch (error) {
       setError(error.response?.data?.error || 'Registration failed');

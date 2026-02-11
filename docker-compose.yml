@@ -50,6 +50,11 @@ services:
       REDIS_HOST: redis
       REDIS_PORT: 6379
       JWT_SECRET: ${JWT_SECRET:-your-secret-key-change-in-production}
+      EMAIL_SERVICE: ${EMAIL_SERVICE:-resend}
+      RESEND_API_KEY: ${RESEND_API_KEY}
+      EMAIL_FROM_NAME: ${EMAIL_FROM_NAME:-AnimeRec}
+      EMAIL_FROM_ADDRESS: ${EMAIL_FROM_ADDRESS:-onboarding@resend.dev}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:3000}
     ports:
       - "5000:5000"
     volumes:

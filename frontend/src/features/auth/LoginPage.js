@@ -22,7 +22,13 @@ const LoginPage = () => {
       localStorage.setItem('user', JSON.stringify(response.data.user));
       navigate('/');
     } catch (error) {
-      setError(error.response?.data?.error || 'Login failed');
+      const errorData = error.response?.data;
+      
+      if (errorData?.requiresVerification) {
+        setError('Please verify your email before logging in. Check your inbox for the verification link.');
+      } else {
+        setError(errorData?.error || 'Login failed');
+      }
     }
   };
 

@@ -7,6 +7,7 @@ import AnimeDetailsPage from './features/anime/AnimeDetailsPage';
 import ProfilePage from './features/profile/ProfilePage';
 import LoginPage from './features/auth/LoginPage';
 import RegisterPage from './features/auth/RegisterPage';
+import VerifyEmailPage from './features/auth/VerifyEmailPage';
 import './App.css';
 
 function App() {
@@ -20,6 +21,7 @@ function App() {
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/verify-email" element={<VerifyEmailPage />} />
         </Routes>
       </Layout>
     </Router>
