@@ -1,0 +1,20 @@
+.recommendations-page {
+  min-height: 100vh;
+  padding: 2rem 0;
+}
+
+.recommendations-page h1 {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.recommendations-page p {
+  color: #999;
+  margin-bottom: 2rem;
+}
+
+.anime-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 2rem;
+}

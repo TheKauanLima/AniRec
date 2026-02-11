@@ -1,0 +1,39 @@
+.profile-page {
+  min-height: 100vh;
+  padding: 2rem 0;
+}
+
+.profile-page h1 {
+  font-size: 2.5rem;
+  margin-bottom: 2rem;
+}
+
+.profile-section {
+  margin-bottom: 3rem;
+}
+
+.profile-section h2 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  border-bottom: 2px solid #667eea;
+  padding-bottom: 0.5rem;
+}
+
+.watchlist-items,
+.ratings-items {
+  display: grid;
+  gap: 1rem;
+}
+
+.watchlist-item,
+.rating-item {
+  background: #1a1a1a;
+  padding: 1rem;
+  border-radius: 8px;
+}
+
+.rating-item .review {
+  margin-top: 0.5rem;
+  color: #999;
+  font-style: italic;
+}
