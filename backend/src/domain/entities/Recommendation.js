@@ -1,5 +1,14 @@
-class Recommendation {
-  constructor({ userId, animeId, score, reason, createdAt }) {
+class Recommendation
+{
+  constructor(
+  {
+    userId,
+    animeId,
+    score,
+    reason,
+    createdAt
+  })
+  {
     this.userId = userId;
     this.animeId = animeId;
     this.score = score;
@@ -7,7 +16,8 @@ class Recommendation {
     this.createdAt = createdAt;
   }
 
-  isHighConfidence() {
+  isHighConfidence()
+  {
     return this.score >= 0.8;
   }
 }

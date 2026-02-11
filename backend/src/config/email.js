@@ -4,13 +4,15 @@ const emailConfig = {
   // Email service configuration
   // Options: 'gmail', 'sendgrid', 'resend', 'mailgun', 'smtp'
   service: process.env.EMAIL_SERVICE || 'resend',
-  
+
   // SMTP settings (for Gmail or custom SMTP)
-  smtp: {
+  smtp:
+  {
     host: process.env.SMTP_HOST || 'smtp.gmail.com',
     port: parseInt(process.env.SMTP_PORT) || 587,
     secure: process.env.SMTP_SECURE === 'true', // true for 465, false for other ports
-    auth: {
+    auth:
+    {
       user: process.env.EMAIL_USER,
       pass: process.env.EMAIL_PASSWORD, // App password for Gmail
     },
@@ -23,7 +25,8 @@ const emailConfig = {
   sendgridApiKey: process.env.SENDGRID_API_KEY,
 
   // Sender details
-  from: {
+  from:
+  {
     name: process.env.EMAIL_FROM_NAME || 'AnimeRec',
     address: process.env.EMAIL_FROM_ADDRESS || process.env.EMAIL_USER,
   },

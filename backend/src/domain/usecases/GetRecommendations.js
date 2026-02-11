@@ -1,11 +1,14 @@
-class GetRecommendations {
-  constructor(animeRepository, userRepository, recommendationEngine) {
+class GetRecommendations
+{
+  constructor(animeRepository, userRepository, recommendationEngine)
+  {
     this.animeRepository = animeRepository;
     this.userRepository = userRepository;
     this.recommendationEngine = recommendationEngine;
   }
 
-  async execute(userId, filters = {}) {
+  async execute(userId, filters = {})
+  {
     // Get user's watch history and ratings
     const userRatings = await this.userRepository.getUserRatings(userId);
     const watchHistory = await this.userRepository.getWatchHistory(userId);

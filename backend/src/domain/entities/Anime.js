@@ -1,16 +1,19 @@
-class Anime {
-  constructor({ 
-    malId, 
-    title, 
-    titleEnglish, 
-    synopsis, 
-    genres, 
-    score, 
-    episodes, 
+class Anime
+{
+  constructor(
+  {
+    malId,
+    title,
+    titleEnglish,
+    synopsis,
+    genres,
+    score,
+    episodes,
     status,
     imageUrl,
     year
-  }) {
+  })
+  {
     this.malId = malId;
     this.title = title;
     this.titleEnglish = titleEnglish;
@@ -23,12 +26,14 @@ class Anime {
     this.year = year;
   }
 
-  isHighlyRated() {
+  isHighlyRated()
+  {
     return this.score >= 8.0;
   }
 
-  hasGenre(genreName) {
-    return this.genres.some(genre => 
+  hasGenre(genreName)
+  {
+    return this.genres.some(genre =>
       genre.name.toLowerCase() === genreName.toLowerCase()
     );
   }

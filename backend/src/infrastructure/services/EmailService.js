@@ -1,41 +1,57 @@
 const nodemailer = require('nodemailer');
 const emailConfig = require('../../config/email');
 
-class EmailService {
-  constructor() {
+class EmailService
+{
+  constructor()
+  {
     this.transporter = null;
     this.useResend = emailConfig.service === 'resend';
     this.resendApiKey = emailConfig.resendApiKey;
-    
-    if (this.useResend) {
+
+    if (this.useResend)
+    {
       this.initializeResend();
-    } else {
+    }
+    else
+    {
       this.initializeTransporter();
     }
   }
 
-  initializeResend() {
-    try {
-      if (!this.resendApiKey) {
+  initializeResend()
+  {
+    try
+    {
+      if (!this.resendApiKey)
+      {
         console.warn('⚠️  Resend API key not configured. Email sending disabled.');
         console.warn('   Set RESEND_API_KEY in .env to enable email verification.');
         return;
       }
 
       // Import Resend dynamically
-      const { Resend } = require('resend');
+      const
+      {
+        Resend
+      } = require('resend');
       this.resendClient = new Resend(this.resendApiKey);
       console.log('✅ Resend email service ready');
-    } catch (error) {
+    }
+    catch (error)
+    {
       console.error('❌ Failed to initialize Resend:', error.message);
       console.warn('   Run: npm install resend');
     }
   }
 
-  initializeTransporter() {
-    try {
+  initializeTransporter()
+  {
+    try
+    {
       // Check if email credentials are configured
-      if (!emailConfig.smtp.auth.user || !emailConfig.smtp.auth.pass) {
+      if (!emailConfig.smtp.auth.user || !emailConfig.smtp.auth.pass)
+      {
         console.warn('⚠️  Email credentials not configured. Email sending disabled.');
         console.warn('   Set EMAIL_USER and EMAIL_PASSWORD in .env to enable email verification.');
         return;
@@ -44,49 +60,79 @@ class EmailService {
       this.transporter = nodemailer.createTransporter(emailConfig.smtp);
 
       // Verify connection
-      this.transporter.verify((error, success) => {
-        if (error) {
+      this.transporter.verify((error, success) =>
+      {
+        if (error)
+        {
           console.error('❌ Email service connection failed:', error.message);
           console.warn('   Email verification will not work until credentials are configured.');
-        } else {
+        }
+        else
+        {
           console.log('✅ Email service ready (SMTP)');
         }
       });
-    } catch (error) {
+    }
+    catch (error)
+    {
       console.error('❌ Failed to initialize email service:', error.message);
     }
   }
 
-  async sendVerificationEmail(email, username, verificationToken) {
+  async sendVerificationEmail(email, username, verificationToken)
+  {
     const verificationUrl = `${emailConfig.frontendUrl}/verify-email?token=${verificationToken}`;
 
     // Use Resend if configured
-    if (this.useResend && this.resendClient) {
-      try {
-        const { data, error } = await this.resendClient.emails.send({
+    if (this.useResend && this.resendClient)
+    {
+      try
+      {
+        const
+        {
+          data,
+          error
+        } = await this.resendClient.emails.send(
+        {
           from: `${emailConfig.from.name} <${emailConfig.from.address}>`,
           to: [email],
           subject: 'Verify Your Email - AnimeRec',
           html: this.getVerificationEmailTemplate(username, verificationUrl),
         });
 
-        if (error) {
+        if (error)
+        {
           console.error('❌ Resend API error:', error);
-          return { success: false, error: error.message };
+          return {
+            success: false,
+            error: error.message
+          };
         }
 
         console.log('✉️  Verification email sent to:', email, '(via Resend)');
-        return { success: true, messageId: data.id };
-      } catch (error) {
+        return {
+          success: true,
+          messageId: data.id
+        };
+      }
+      catch (error)
+      {
         console.error('❌ Failed to send verification email via Resend:', error.message);
-        return { success: false, error: error.message };
+        return {
+          success: false,
+          error: error.message
+        };
       }
     }
 
     // Fall back to SMTP
-    if (!this.transporter) {
+    if (!this.transporter)
+    {
       console.warn('Email service not configured. Skipping verification email.');
-      return { success: false, error: 'Email service not configured' };
+      return {
+        success: false,
+        error: 'Email service not configured'
+      };
     }
 
     const mailOptions = {
@@ -97,46 +143,79 @@ class EmailService {
       text: `Hi ${username},\n\nWelcome to AnimeRec! Please verify your email by clicking this link:\n${verificationUrl}\n\nThis link will expire in 24 hours.\n\nIf you didn't create an account, please ignore this email.`,
     };
 
-    try {
+    try
+    {
       const info = await this.transporter.sendMail(mailOptions);
       console.log('✉️  Verification email sent to:', email);
-      return { success: true, messageId: info.messageId };
-    } catch (error) {
+      return {
+        success: true,
+        messageId: info.messageId
+      };
+    }
+    catch (error)
+    {
       console.error('❌ Failed to send verification email:', error.message);
-      return { success: false, error: error.message };
+      return {
+        success: false,
+        error: error.message
+      };
     }
   }
 
-  async sendPasswordResetEmail(email, username, resetToken) {
+  async sendPasswordResetEmail(email, username, resetToken)
+  {
     const resetUrl = `${emailConfig.frontendUrl}/reset-password?token=${resetToken}`;
 
     // Use Resend if configured
-    if (this.useResend && this.resendClient) {
-      try {
-        const { data, error } = await this.resendClient.emails.send({
+    if (this.useResend && this.resendClient)
+    {
+      try
+      {
+        const
+        {
+          data,
+          error
+        } = await this.resendClient.emails.send(
+        {
           from: `${emailConfig.from.name} <${emailConfig.from.address}>`,
           to: [email],
           subject: 'Reset Your Password - AnimeRec',
           html: this.getPasswordResetEmailTemplate(username, resetUrl),
         });
 
-        if (error) {
+        if (error)
+        {
           console.error('❌ Resend API error:', error);
-          return { success: false, error: error.message };
+          return {
+            success: false,
+            error: error.message
+          };
         }
 
         console.log('✉️  Password reset email sent to:', email, '(via Resend)');
-        return { success: true, messageId: data.id };
-      } catch (error) {
+        return {
+          success: true,
+          messageId: data.id
+        };
+      }
+      catch (error)
+      {
         console.error('❌ Failed to send password reset email via Resend:', error.message);
-        return { success: false, error: error.message };
+        return {
+          success: false,
+          error: error.message
+        };
       }
     }
 
     // Fall back to SMTP
-    if (!this.transporter) {
+    if (!this.transporter)
+    {
       console.warn('Email service not configured. Skipping password reset email.');
-      return { success: false, error: 'Email service not configured' };
+      return {
+        success: false,
+        error: 'Email service not configured'
+      };
     }
 
     const mailOptions = {
@@ -147,17 +226,27 @@ class EmailService {
       text: `Hi ${username},\n\nYou requested to reset your password. Click this link to reset:\n${resetUrl}\n\nThis link will expire in 1 hour.\n\nIf you didn't request this, please ignore this email.`,
     };
 
-    try {
+    try
+    {
       const info = await this.transporter.sendMail(mailOptions);
       console.log('✉️  Password reset email sent to:', email);
-      return { success: true, messageId: info.messageId };
-    } catch (error) {
+      return {
+        success: true,
+        messageId: info.messageId
+      };
+    }
+    catch (error)
+    {
       console.error('❌ Failed to send password reset email:', error.message);
-      return { success: false, error: error.message };
+      return {
+        success: false,
+        error: error.message
+      };
     }
   }
 
-  getVerificationEmailTemplate(username, verificationUrl) {
+  getVerificationEmailTemplate(username, verificationUrl)
+  {
     return `
       <!DOCTYPE html>
       <html>
@@ -197,7 +286,8 @@ class EmailService {
     `;
   }
 
-  getPasswordResetEmailTemplate(username, resetUrl) {
+  getPasswordResetEmailTemplate(username, resetUrl)
+  {
     return `
       <!DOCTYPE html>
       <html>

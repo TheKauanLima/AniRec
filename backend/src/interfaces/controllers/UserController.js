@@ -3,34 +3,56 @@ const AddToWatchlist = require('../../domain/usecases/AddToWatchlist');
 const RateAnime = require('../../domain/usecases/RateAnime');
 const AnimeRepository = require('../../infrastructure/database/repositories/AnimeRepository');
 
-class UserController {
-  constructor() {
+class UserController
+{
+  constructor()
+  {
     this.animeRepository = new AnimeRepository();
   }
 
-  async getWatchlist(req, res) {
-    try {
+  async getWatchlist(req, res)
+  {
+    try
+    {
       const userId = req.user.userId;
-      
+
       const result = await pool.query(
         'SELECT * FROM watchlist WHERE user_id = $1 ORDER BY added_at DESC',
         [userId]
       );
 
-      res.json({ watchlist: result.rows });
-    } catch (error) {
+      res.json(
+      {
+        watchlist: result.rows
+      });
+    }
+    catch (error)
+    {
       console.error('Error fetching watchlist:', error);
-      res.status(500).json({ error: 'Failed to fetch watchlist' });
+      res.status(500).json(
+      {
+        error: 'Failed to fetch watchlist'
+      });
     }
   }
 
-  async addToWatchlist(req, res) {
-    try {
+  async addToWatchlist(req, res)
+  {
+    try
+    {
       const userId = req.user.userId;
-      const { animeId, status = 'plan_to_watch' } = req.body;
+      const
+      {
+        animeId,
+        status = 'plan_to_watch'
+      } = req.body;
 
-      if (!animeId) {
-        return res.status(400).json({ error: 'Anime ID is required' });
+      if (!animeId)
+      {
+        return res.status(400).json(
+        {
+          error: 'Anime ID is required'
+        });
       }
 
       const result = await pool.query(
@@ -41,44 +63,78 @@ class UserController {
         [userId, animeId, status, new Date()]
       );
 
-      res.status(201).json({ 
+      res.status(201).json(
+      {
         message: 'Added to watchlist',
-        item: result.rows[0] 
+        item: result.rows[0]
       });
-    } catch (error) {
+    }
+    catch (error)
+    {
       console.error('Error adding to watchlist:', error);
-      res.status(500).json({ error: 'Failed to add to watchlist' });
+      res.status(500).json(
+      {
+        error: 'Failed to add to watchlist'
+      });
     }
   }
 
-  async removeFromWatchlist(req, res) {
-    try {
+  async removeFromWatchlist(req, res)
+  {
+    try
+    {
       const userId = req.user.userId;
-      const { animeId } = req.params;
+      const
+      {
+        animeId
+      } = req.params;
 
       await pool.query(
         'DELETE FROM watchlist WHERE user_id = $1 AND anime_id = $2',
         [userId, animeId]
       );
 
-      res.json({ message: 'Removed from watchlist' });
-    } catch (error) {
+      res.json(
+      {
+        message: 'Removed from watchlist'
+      });
+    }
+    catch (error)
+    {
       console.error('Error removing from watchlist:', error);
-      res.status(500).json({ error: 'Failed to remove from watchlist' });
+      res.status(500).json(
+      {
+        error: 'Failed to remove from watchlist'
+      });
     }
   }
 
-  async rateAnime(req, res) {
-    try {
+  async rateAnime(req, res)
+  {
+    try
+    {
       const userId = req.user.userId;
-      const { animeId, rating, review } = req.body;
+      const
+      {
+        animeId,
+        rating,
+        review
+      } = req.body;
 
-      if (!animeId || !rating) {
-        return res.status(400).json({ error: 'Anime ID and rating are required' });
+      if (!animeId || !rating)
+      {
+        return res.status(400).json(
+        {
+          error: 'Anime ID and rating are required'
+        });
       }
 
-      if (rating < 1 || rating > 10) {
-        return res.status(400).json({ error: 'Rating must be between 1 and 10' });
+      if (rating < 1 || rating > 10)
+      {
+        return res.status(400).json(
+        {
+          error: 'Rating must be between 1 and 10'
+        });
       }
 
       const result = await pool.query(
@@ -90,18 +146,26 @@ class UserController {
         [userId, animeId, rating, review, new Date()]
       );
 
-      res.status(201).json({ 
+      res.status(201).json(
+      {
         message: 'Rating saved',
-        rating: result.rows[0] 
+        rating: result.rows[0]
       });
-    } catch (error) {
+    }
+    catch (error)
+    {
       console.error('Error saving rating:', error);
-      res.status(500).json({ error: 'Failed to save rating' });
+      res.status(500).json(
+      {
+        error: 'Failed to save rating'
+      });
     }
   }
 
-  async getRatings(req, res) {
-    try {
+  async getRatings(req, res)
+  {
+    try
+    {
       const userId = req.user.userId;
 
       const result = await pool.query(
@@ -109,10 +173,18 @@ class UserController {
         [userId]
       );
 
-      res.json({ ratings: result.rows });
-    } catch (error) {
+      res.json(
+      {
+        ratings: result.rows
+      });
+    }
+    catch (error)
+    {
       console.error('Error fetching ratings:', error);
-      res.status(500).json({ error: 'Failed to fetch ratings' });
+      res.status(500).json(
+      {
+        error: 'Failed to fetch ratings'
+      });
     }
   }
 }
