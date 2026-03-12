@@ -139,6 +139,35 @@
   background: rgba(9, 20, 34, 0.74);
 }
 
+.anime-card-media {
+  display: flex;
+  gap: 0.8rem;
+  align-items: flex-start;
+}
+
+.anime-thumb {
+  width: 58px;
+  height: 82px;
+  border-radius: 8px;
+  object-fit: cover;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  flex-shrink: 0;
+}
+
+.anime-thumb-placeholder {
+  background:
+    linear-gradient(160deg, rgba(41, 88, 140, 0.25), rgba(23, 49, 79, 0.28)),
+    repeating-linear-gradient(-45deg,
+      rgba(255, 255, 255, 0.1),
+      rgba(255, 255, 255, 0.1) 6px,
+      rgba(255, 255, 255, 0.04) 6px,
+      rgba(255, 255, 255, 0.04) 12px);
+}
+
+.anime-card-copy {
+  min-width: 0;
+}
+
 .item-title {
   margin: 0;
   font-family: 'Barlow Condensed', sans-serif;
@@ -153,11 +182,19 @@
   font-size: 0.92rem;
 }
 
+.item-subtext {
+  margin-top: 0.2rem;
+  color: #b9c7de;
+  font-family: 'Manrope', sans-serif;
+  font-size: 0.84rem;
+}
+
 .rating-item .review {
   margin-top: 0.45rem;
   color: #c7d2e6;
   font-style: italic;
   font-family: 'Manrope', sans-serif;
+  font-size: 0.84rem;
 }
 
 .empty-state {

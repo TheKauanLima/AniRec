@@ -108,8 +108,26 @@ const ProfilePage = () => {
             )}
             {watchlist.map((item) => (
               <div key={item.id} className="watchlist-item">
-                <p className="item-title">Anime #{item.anime_id}</p>
-                <p className="item-meta">Status: {item.status}</p>
+                <div className="anime-card-media">
+                  {item.image_url ? (
+                    <img
+                      src={item.image_url}
+                      alt={`${item.title} thumbnail`}
+                      className="anime-thumb"
+                      referrerPolicy="no-referrer"
+                    />
+                  ) : (
+                    <div className="anime-thumb anime-thumb-placeholder" aria-hidden="true" />
+                  )}
+
+                  <div className="anime-card-copy">
+                    <p className="item-title">{item.title || `Anime #${item.anime_id}`}</p>
+                    <p className="item-subtext">{item.studio_names || 'Unknown studio'}</p>
+                    <p className="item-meta">
+                      My rating: {item.user_rating ? `${item.user_rating}/10` : 'Not rated yet'}
+                    </p>
+                  </div>
+                </div>
               </div>
             ))}
           </div>
@@ -123,9 +141,25 @@ const ProfilePage = () => {
             )}
             {ratings.map((rating) => (
               <div key={rating.id} className="rating-item">
-                <p className="item-title">Anime #{rating.anime_id}</p>
-                <p className="item-meta">Rating: {rating.rating}/10</p>
-                {rating.review && <p className="review">{rating.review}</p>}
+                <div className="anime-card-media">
+                  {rating.image_url ? (
+                    <img
+                      src={rating.image_url}
+                      alt={`${rating.title} thumbnail`}
+                      className="anime-thumb"
+                      referrerPolicy="no-referrer"
+                    />
+                  ) : (
+                    <div className="anime-thumb anime-thumb-placeholder" aria-hidden="true" />
+                  )}
+
+                  <div className="anime-card-copy">
+                    <p className="item-title">{rating.title || `Anime #${rating.anime_id}`}</p>
+                    <p className="item-subtext">{rating.studio_names || 'Unknown studio'}</p>
+                    <p className="item-meta">My rating: {rating.rating}/10</p>
+                    {rating.review && <p className="review">{rating.review}</p>}
+                  </div>
+                </div>
               </div>
             ))}
           </div>

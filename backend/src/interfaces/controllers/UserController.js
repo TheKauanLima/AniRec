@@ -85,7 +85,24 @@ class UserController {
       const userId = req.user.userId;
 
       const result = await pool.query(
-        'SELECT * FROM watchlist WHERE user_id = $1 ORDER BY added_at DESC',
+        `SELECT
+          w.id,
+          w.anime_id,
+          w.status,
+          w.added_at,
+          COALESCE(uma.title, 'Anime #' || w.anime_id::text) AS title,
+          COALESCE(NULLIF(uma.studio_names, ''), 'Unknown studio') AS studio_names,
+          COALESCE(r.rating, uma.user_rating) AS user_rating,
+          uma.image_url
+        FROM watchlist w
+        LEFT JOIN user_mal_anime uma
+          ON uma.user_id = w.user_id
+          AND uma.mal_id = w.anime_id
+        LEFT JOIN ratings r
+          ON r.user_id = w.user_id
+          AND r.anime_id = w.anime_id
+        WHERE w.user_id = $1
+        ORDER BY w.added_at DESC`,
         [userId]
       );
 
@@ -222,7 +239,21 @@ class UserController {
       const userId = req.user.userId;
 
       const result = await pool.query(
-        'SELECT * FROM ratings WHERE user_id = $1 ORDER BY created_at DESC',
+        `SELECT
+          r.id,
+          r.anime_id,
+          r.rating,
+          r.review,
+          r.created_at,
+          COALESCE(uma.title, 'Anime #' || r.anime_id::text) AS title,
+          COALESCE(NULLIF(uma.studio_names, ''), 'Unknown studio') AS studio_names,
+          uma.image_url
+        FROM ratings r
+        LEFT JOIN user_mal_anime uma
+          ON uma.user_id = r.user_id
+          AND uma.mal_id = r.anime_id
+        WHERE r.user_id = $1
+        ORDER BY r.created_at DESC`,
         [userId]
       );
 
