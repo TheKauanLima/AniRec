@@ -8,6 +8,7 @@ import ProfilePage from './features/profile/ProfilePage';
 import LoginPage from './features/auth/LoginPage';
 import RegisterPage from './features/auth/RegisterPage';
 import VerifyEmailPage from './features/auth/VerifyEmailPage';
+import MALCallbackPage from './features/auth/MALCallbackPage';
 import './App.css';
 
 function App() {
@@ -22,6 +23,7 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/verify-email" element={<VerifyEmailPage />} />
+          <Route path="/auth/mal/callback" element={<MALCallbackPage />} />
         </Routes>
       </Layout>
     </Router>

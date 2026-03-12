@@ -23,7 +23,7 @@ const LoginPage = () => {
       navigate('/');
     } catch (error) {
       const errorData = error.response?.data;
-      
+
       if (errorData?.requiresVerification) {
         setError('Please verify your email before logging in. Check your inbox for the verification link.');
       } else {
@@ -32,12 +32,29 @@ const LoginPage = () => {
     }
   };
 
+  const handleMALLogin = async () => {
+    setError('');
+    try {
+      const response = await apiClient.get('/auth/mal/auth-url');
+      const { authUrl, codeVerifier, state } = response.data;
+
+      // Store PKCE verifier and state in sessionStorage for the callback
+      sessionStorage.setItem('mal_code_verifier', codeVerifier);
+      sessionStorage.setItem('mal_state', state);
+
+      // Redirect to MAL authorization page
+      window.location.href = authUrl;
+    } catch (error) {
+      setError('Failed to start MAL login. Please try again.');
+    }
+  };
+
   return (
     <div className="auth-page">
       <div className="auth-container">
         <h1>Login</h1>
         {error && <div className="error-message">{error}</div>}
-        
+
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label>Email</label>
@@ -63,6 +80,14 @@ const LoginPage = () => {
 
           <button type="submit" className="btn-submit">Login</button>
         </form>
+
+        <div className="auth-divider">
+          <span>or</span>
+        </div>
+
+        <button type="button" className="btn-mal" onClick={handleMALLogin}>
+          Login with MyAnimeList
+        </button>
 
         <p className="auth-link">
           Don't have an account? <Link to="/register">Register</Link>
