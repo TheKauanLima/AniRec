@@ -7,6 +7,7 @@ const userController = new UserController();
 
 router.use(authMiddleware); // All user routes require authentication
 
+router.get('/profile', (req, res) => userController.getProfile(req, res));
 router.get('/watchlist', (req, res) => userController.getWatchlist(req, res));
 router.post('/watchlist', (req, res) => userController.addToWatchlist(req, res));
 router.delete('/watchlist/:animeId', (req, res) => userController.removeFromWatchlist(req, res));

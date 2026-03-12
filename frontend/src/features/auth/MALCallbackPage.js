@@ -65,7 +65,15 @@ const MALCallbackPage = () => {
                 localStorage.setItem('token', response.data.token);
                 localStorage.setItem('user', JSON.stringify(response.data.user));
 
-                setStatus('Login successful! Redirecting...');
+                setStatus('Login successful. Importing your MAL list...');
+
+                try {
+                    await apiClient.post('/auth/mal/import');
+                    setStatus('Import complete! Redirecting...');
+                } catch (importError) {
+                    console.warn('MAL import failed after login:', importError.response?.data || importError.message);
+                    setStatus('Logged in. Redirecting...');
+                }
 
                 setTimeout(() => {
                     navigate('/');

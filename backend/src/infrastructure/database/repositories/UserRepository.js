@@ -2,6 +2,104 @@ const pool = require('../../../config/database');
 const User = require('../../../domain/entities/User');
 
 class UserRepository {
+  async ensureUserMalAnimeTable() {
+    await pool.query(
+      `CREATE TABLE IF NOT EXISTS user_mal_anime (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        mal_id INTEGER NOT NULL,
+        title VARCHAR(500) NOT NULL,
+        user_rating INTEGER,
+        mal_average_rating NUMERIC(4,2),
+        year INTEGER,
+        studio_names TEXT,
+        num_episodes INTEGER,
+        num_seasons INTEGER,
+        episodes_watched INTEGER,
+        mal_status VARCHAR(30),
+        media_type VARCHAR(30),
+        genres TEXT,
+        image_url TEXT,
+        start_season VARCHAR(20),
+        start_date DATE,
+        imported_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(user_id, mal_id)
+      )`
+    );
+
+    await pool.query('CREATE INDEX IF NOT EXISTS idx_user_mal_anime_user_id ON user_mal_anime(user_id)');
+    await pool.query('CREATE INDEX IF NOT EXISTS idx_user_mal_anime_mal_id ON user_mal_anime(mal_id)');
+  }
+
+  async upsertUserMalAnime(userId, animeData) {
+    const result = await pool.query(
+      `INSERT INTO user_mal_anime (
+        user_id,
+        mal_id,
+        title,
+        user_rating,
+        mal_average_rating,
+        year,
+        studio_names,
+        num_episodes,
+        num_seasons,
+        episodes_watched,
+        mal_status,
+        media_type,
+        genres,
+        image_url,
+        start_season,
+        start_date,
+        imported_at,
+        updated_at
+      )
+      VALUES (
+        $1, $2, $3, $4, $5, $6, $7, $8,
+        $9, $10, $11, $12, $13, $14, $15, $16,
+        NOW(), NOW()
+      )
+      ON CONFLICT (user_id, mal_id)
+      DO UPDATE SET
+        title = EXCLUDED.title,
+        user_rating = EXCLUDED.user_rating,
+        mal_average_rating = EXCLUDED.mal_average_rating,
+        year = EXCLUDED.year,
+        studio_names = EXCLUDED.studio_names,
+        num_episodes = EXCLUDED.num_episodes,
+        num_seasons = EXCLUDED.num_seasons,
+        episodes_watched = EXCLUDED.episodes_watched,
+        mal_status = EXCLUDED.mal_status,
+        media_type = EXCLUDED.media_type,
+        genres = EXCLUDED.genres,
+        image_url = EXCLUDED.image_url,
+        start_season = EXCLUDED.start_season,
+        start_date = EXCLUDED.start_date,
+        updated_at = NOW()
+      RETURNING *`,
+      [
+        userId,
+        animeData.malId,
+        animeData.title,
+        animeData.userRating,
+        animeData.malAverageRating,
+        animeData.year,
+        animeData.studioNames,
+        animeData.numEpisodes,
+        animeData.numSeasons,
+        animeData.episodesWatched,
+        animeData.malStatus,
+        animeData.mediaType,
+        animeData.genres,
+        animeData.imageUrl,
+        animeData.startSeason,
+        animeData.startDate,
+      ]
+    );
+
+    return result.rows[0];
+  }
+
   async findById(id) {
     const result = await pool.query(
       'SELECT * FROM users WHERE id = $1',

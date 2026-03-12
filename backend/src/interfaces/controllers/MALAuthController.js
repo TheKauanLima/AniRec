@@ -107,6 +107,7 @@ class MALAuthController {
                     isVerified: true,
                     malUsername: user.malUsername,
                     malConnected: true,
+                    profilePicture: malProfile.picture || null,
                 },
             });
         }
@@ -142,9 +143,13 @@ class MALAuthController {
             // Fetch the user's full anime list from MAL
             const animeList = await this.malClient.getFullUserAnimeList(accessToken);
 
+            // Ensure table for imported watched/rated MAL anime exists.
+            await this.userRepository.ensureUserMalAnimeTable();
+
             // Import rated anime into our ratings table
             let imported = 0;
             let skipped = 0;
+            let watchedOrRatedImported = 0;
 
             for (const anime of animeList) {
                 if (anime.listStatus.score > 0) {
@@ -175,6 +180,32 @@ class MALAuthController {
                 const status = statusMap[anime.listStatus.status] || 'plan_to_watch';
                 await this.userRepository.upsertWatchlistItem(userId, anime.malId, status);
                 watchlistImported++;
+
+                // Persist all watched or rated anime with MAL metadata.
+                const isWatched = status !== 'plan_to_watch';
+                const isRated = anime.listStatus.score > 0;
+
+                if (isWatched || isRated) {
+                    await this.userRepository.upsertUserMalAnime(userId, {
+                        malId: anime.malId,
+                        title: anime.title,
+                        userRating: isRated ? anime.listStatus.score : null,
+                        malAverageRating: anime.mean || null,
+                        year: anime.year || null,
+                        studioNames: (anime.studioNames || []).join(', ') || null,
+                        numEpisodes: anime.numEpisodes || null,
+                        numSeasons: anime.numSeasons || null,
+                        episodesWatched: anime.listStatus.numEpisodesWatched || null,
+                        malStatus: anime.listStatus.status || null,
+                        mediaType: anime.mediaType || null,
+                        genres: (anime.genreNames || []).join(', ') || null,
+                        imageUrl: anime.mainPictureUrl || null,
+                        startSeason: anime.startSeason || null,
+                        startDate: anime.startDate || null,
+                    });
+
+                    watchedOrRatedImported++;
+                }
             }
 
             res.json({
@@ -184,6 +215,7 @@ class MALAuthController {
                     ratingsImported: imported,
                     ratingsSkipped: skipped,
                     watchlistImported,
+                    watchedOrRatedImported,
                 },
             });
         }

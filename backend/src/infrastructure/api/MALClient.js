@@ -96,6 +96,7 @@ class MALClient {
     async getUserProfile(accessToken) {
         const response = await this.apiClient.get('/users/@me', {
             headers: { Authorization: `Bearer ${accessToken}` },
+            params: { fields: 'picture' },
         });
 
         return {
@@ -108,7 +109,7 @@ class MALClient {
     // Get the user's anime list with scores
     async getUserAnimeList(accessToken, { status, limit = 100, offset = 0 } = {}) {
         const params = {
-            fields: 'list_status,num_episodes,genres,mean,media_type,status',
+            fields: 'list_status,num_episodes,genres,mean,media_type,status,start_season,start_date,studios,main_picture',
             limit,
             offset,
             nsfw: 'false',
@@ -128,10 +129,19 @@ class MALClient {
                 malId: item.node.id,
                 title: item.node.title,
                 mainPicture: item.node.main_picture,
+                mainPictureUrl: item.node.main_picture?.large || item.node.main_picture?.medium || null,
                 numEpisodes: item.node.num_episodes,
                 mean: item.node.mean,
                 mediaType: item.node.media_type,
                 genres: item.node.genres,
+                genreNames: (item.node.genres || []).map(genre => genre.name),
+                studios: item.node.studios,
+                studioNames: (item.node.studios || []).map(studio => studio.name),
+                startSeason: item.node.start_season?.season || null,
+                startSeasonYear: item.node.start_season?.year || null,
+                startDate: item.node.start_date || null,
+                year: item.node.start_season?.year || (item.node.start_date ? new Date(item.node.start_date).getFullYear() : null),
+                numSeasons: this.inferSeasonCount(item.node.title),
                 listStatus: {
                     status: item.list_status.status,
                     score: item.list_status.score,
@@ -161,6 +171,25 @@ class MALClient {
         }
 
         return allAnime;
+    }
+
+    // MAL does not expose franchise season count directly; infer from title when possible.
+    inferSeasonCount(title) {
+        if (!title) {
+            return null;
+        }
+
+        const seasonPattern = title.match(/season\s*(\d+)/i) || title.match(/(\d+)(st|nd|rd|th)\s+season/i);
+        if (seasonPattern && seasonPattern[1]) {
+            return parseInt(seasonPattern[1], 10);
+        }
+
+        const partPattern = title.match(/part\s*(\d+)/i);
+        if (partPattern && partPattern[1]) {
+            return parseInt(partPattern[1], 10);
+        }
+
+        return null;
     }
 }
 
